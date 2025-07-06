@@ -8,14 +8,15 @@ import 'presentation/blocs/auth_event_state.dart';
 import 'presentation/screens/auth_screen.dart';
 import 'presentation/screens/notes_screen.dart';
 import 'core/constants.dart';
+import 'dart:developer';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
-    print('Firebase initialized successfully');
+    log('Firebase initialized successfully');
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    log('Firebase initialization failed: $e');
   }
   runApp(const MyApp());
 }
@@ -123,7 +124,7 @@ class SplashScreen extends StatelessWidget {
               'Capture your thoughts, organize your ideas',
               style: GoogleFonts.poppins(
                 fontSize: 16,
-                color: Colors.white.withOpacity(0.9),
+                color:  Colors.white.withAlpha(230),
               ),
               textAlign: TextAlign.center,
             ),

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import '../../core/error.dart';
 import '../../core/constants.dart';
+import "dart:developer";
 
 // Firebase authentication service
 class FirebaseAuthService {
@@ -31,26 +32,26 @@ class FirebaseAuthService {
   // Sign in with email and password
   Future<UserModel> signInWithEmailAndPassword(String email, String password) async {
     try {
-      print('Firebase Auth: Attempting sign in for $email'); // Debug log
+      log('Firebase Auth: Attempting sign in for $email'); // Debug log
       final UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       
       if (userCredential.user != null) {
-        print('Firebase Auth: Sign in successful for $email'); // Debug log
+        log('Firebase Auth: Sign in successful for $email'); // Debug log
         return UserModel.fromFirebaseUser(userCredential.user!);
       } else {
-        print('Firebase Auth: User is null after sign in'); // Debug log
+        log('Firebase Auth: User is null after sign in'); // Debug log
         throw const AuthFailure('Sign in failed: User is null');
       }
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error: ${e.code} - ${e.message}'); // Debug log
+      log('Firebase Auth Error: ${e.code} - ${e.message}'); // Debug log
       final errorMessage = _getAuthErrorMessage(e.code);
-      print('Mapped Error Message: $errorMessage'); // Debug log
+      log('Mapped Error Message: $errorMessage'); // Debug log
       throw AuthFailure(errorMessage);
     } catch (e) {
-      print('General Error during sign in: $e'); // Debug log
+      log('General Error during sign in: $e'); // Debug log
       throw AuthFailure('Sign in failed: ${e.toString()}');
     }
   }
@@ -58,14 +59,14 @@ class FirebaseAuthService {
   // Create user with email and password
   Future<UserModel> createUserWithEmailAndPassword(String email, String password) async {
     try {
-      print('Firebase Auth: Attempting create user for $email'); // Debug log
+      log('Firebase Auth: Attempting create user for $email'); // Debug log
       final UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
       
       if (userCredential.user != null) {
-        print('Firebase Auth: User created successfully for $email'); // Debug log
+        log('Firebase Auth: User created successfully for $email'); // Debug log
         final userModel = UserModel.fromFirebaseUser(userCredential.user!);
         
         // Save user data to Firestore
@@ -74,19 +75,19 @@ class FirebaseAuthService {
             .doc(userModel.id)
             .set(userModel.toMap());
         
-        print('Firebase Auth: User data saved to Firestore'); // Debug log
+        log('Firebase Auth: User data saved to Firestore'); // Debug log
         return userModel;
       } else {
-        print('Firebase Auth: User is null after creation'); // Debug log
+        log('Firebase Auth: User is null after creation'); // Debug log
         throw const AuthFailure('Account creation failed: User is null');
       }
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error during creation: ${e.code} - ${e.message}'); // Debug log
+      log('Firebase Auth Error during creation: ${e.code} - ${e.message}'); // Debug log
       final errorMessage = _getAuthErrorMessage(e.code);
-      print('Mapped Error Message: $errorMessage'); // Debug log
+      log('Mapped Error Message: $errorMessage'); // Debug log
       throw AuthFailure(errorMessage);
     } catch (e) {
-      print('General Error during account creation: $e'); // Debug log
+      log('General Error during account creation: $e'); // Debug log
       throw AuthFailure('Account creation failed: ${e.toString()}');
     }
   }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/auth_usecases.dart';
 import '../../core/error.dart';
 import 'auth_event_state.dart';
+import "dart:developer";
 
 // Auth BLoC for managing authentication state
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -10,7 +11,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignInWithEmailAndPassword _signInWithEmailAndPassword;
   final CreateUserWithEmailAndPassword _createUserWithEmailAndPassword;
   final SignOut _signOut;
-  final GetAuthStateChanges _getAuthStateChanges;
 
   StreamSubscription? _authStateSubscription;
 
@@ -24,7 +24,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _signInWithEmailAndPassword = signInWithEmailAndPassword,
         _createUserWithEmailAndPassword = createUserWithEmailAndPassword,
         _signOut = signOut,
-        _getAuthStateChanges = getAuthStateChanges,
         super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<SignInRequested>(_onSignInRequested);
@@ -51,30 +50,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onSignInRequested(SignInRequested event, Emitter<AuthState> emit) async {
     try {
-      print('AuthBloc: Starting sign in process for ${event.email}'); // Debug log
+      log('AuthBloc: Starting sign in process for ${event.email}'); // Debug log
       emit(AuthLoading());
       final user = await _signInWithEmailAndPassword(event.email, event.password);
-      print('AuthBloc: Sign in successful, emitting AuthAuthenticated'); // Debug log
+      log('AuthBloc: Sign in successful, emitting AuthAuthenticated'); // Debug log
       // Only emit authenticated state if sign in was successful
       emit(AuthAuthenticated(user));
     } on AuthFailure catch (e) {
-      print('AuthBloc: AuthFailure caught: ${e.message}'); // Debug log
+      log('AuthBloc: AuthFailure caught: ${e.message}'); // Debug log
       // Emit error state and stay on current screen to show error
       emit(AuthError(e.message));
       // After showing error, return to unauthenticated state
       Future.delayed(const Duration(milliseconds: 100), () {
         if (!isClosed) {
-          print('AuthBloc: Returning to unauthenticated state after error'); // Debug log
+          log('AuthBloc: Returning to unauthenticated state after error'); // Debug log
           emit(AuthUnauthenticated());
         }
       });
     } catch (e) {
-      print('AuthBloc: General error caught: $e'); // Debug log
+      log('AuthBloc: General error caught: $e'); // Debug log
       emit(AuthError('An unexpected error occurred. Please try again.'));
       // After showing error, return to unauthenticated state
       Future.delayed(const Duration(milliseconds: 100), () {
         if (!isClosed) {
-          print('AuthBloc: Returning to unauthenticated state after general error'); // Debug log
+          log('AuthBloc: Returning to unauthenticated state after general error'); // Debug log
           emit(AuthUnauthenticated());
         }
       });

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../blocs/auth_bloc.dart';
 import '../blocs/auth_event_state.dart';
 import '../../core/constants.dart';
+import "dart:developer";
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -48,7 +49,7 @@ class _AuthScreenState extends State<AuthScreen> {
     });
 
     try {
-      print('AuthScreen: Starting direct Firebase auth for $email');
+      log('AuthScreen: Starting direct Firebase auth for $email');
       
       if (_isSignUp) {
         // Create new account
@@ -56,7 +57,7 @@ class _AuthScreenState extends State<AuthScreen> {
             .createUserWithEmailAndPassword(email: email, password: password);
         
         if (userCredential.user != null) {
-          print('AuthScreen: Account created successfully');
+          log('AuthScreen: Account created successfully');
           _showSnackBar(AppConstants.userCreated, isError: false);
           // Trigger BLoC to update app state
           if (mounted) {
@@ -69,7 +70,7 @@ class _AuthScreenState extends State<AuthScreen> {
             .signInWithEmailAndPassword(email: email, password: password);
         
         if (userCredential.user != null) {
-          print('AuthScreen: Sign in successful');
+          log('AuthScreen: Sign in successful');
           _showSnackBar(AppConstants.userLoggedIn, isError: false);
           // Trigger BLoC to update app state
           if (mounted) {
@@ -78,7 +79,7 @@ class _AuthScreenState extends State<AuthScreen> {
         }
       }
     } on FirebaseAuthException catch (e) {
-      print('AuthScreen: FirebaseAuthException - ${e.code}: ${e.message}');
+      log('AuthScreen: FirebaseAuthException - ${e.code}: ${e.message}');
       
       String errorMessage;
       switch (e.code) {
@@ -118,7 +119,7 @@ class _AuthScreenState extends State<AuthScreen> {
       
       _showSnackBar(errorMessage, isError: true);
     } catch (e) {
-      print('AuthScreen: General error - $e');
+      log('AuthScreen: General error - $e');
       _showSnackBar('An unexpected error occurred. Please try again.', isError: true);
     } finally {
       if (mounted) {
@@ -130,7 +131,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _showSnackBar(String message, {bool isError = false}) {
-    print('AuthScreen: Showing snackbar - "$message", isError: $isError');
+    log('AuthScreen: Showing snackbar - "$message", isError: $isError');
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -178,7 +179,7 @@ class _AuthScreenState extends State<AuthScreen> {
         listener: (context, state) {
           // Only listen for navigation purposes, not for error handling
           if (state is AuthAuthenticated) {
-            print('AuthScreen: User authenticated via BLoC');
+            log('AuthScreen: User authenticated via BLoC');
           }
         },
         child: SafeArea(
